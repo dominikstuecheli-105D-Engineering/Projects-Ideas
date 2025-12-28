@@ -1,4 +1,4 @@
-# Projects-Ideas: A Project management/organisation App for macOS and iOS (iPad)
+# Projects&Ideas: A Project management/organisation App for macOS and iOS (iPad)
 
 by Dominik Stücheli
 
