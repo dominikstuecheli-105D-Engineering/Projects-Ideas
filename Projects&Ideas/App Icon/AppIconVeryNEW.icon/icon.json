@@ -1,0 +1,103 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "extended-gray:1.00000,1.00000",
+      "display-p3:0.83577,0.84572,0.84572,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "normal",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "6 – Layer-1.svg",
+          "name" : "6 – Layer-1",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              6.9639892578125,
+              7.891204833984375
+            ]
+          }
+        },
+        {
+          "image-name" : "6 – Layer.svg",
+          "name" : "6 – Layer"
+        },
+        {
+          "glass" : true,
+          "image-name" : "5 – Layer.svg",
+          "name" : "5 – Layer"
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "extended-gray:0.25000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "4 – Layer.svg",
+          "name" : "4 – Layer",
+          "opacity-specializations" : [
+            {
+              "value" : 0.75
+            },
+            {
+              "appearance" : "dark",
+              "value" : 0.5
+            }
+          ]
+        },
+        {
+          "image-name" : "3 – Layer.svg",
+          "name" : "3 – Layer",
+          "opacity-specializations" : [
+            {
+              "value" : 0.75
+            },
+            {
+              "appearance" : "dark",
+              "value" : 0.3
+            }
+          ]
+        }
+      ],
+      "name" : "App Icon Template (Community)-9",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
