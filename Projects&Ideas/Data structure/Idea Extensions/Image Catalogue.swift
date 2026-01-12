@@ -35,6 +35,18 @@ import SwiftData
 		
 		self.image = copy.image
 	}
+	
+	//Another initialiser for JSON importing
+	init?(fromDTO: ImageCatalogueItemDTO) {
+		self.title = fromDTO.title
+		self.position = fromDTO.position
+		if let data = Data(base64Encoded: fromDTO.image) {
+			self.image = data
+		} else {
+			customNotificationCentre.shared.new("Lost Image \"\(fromDTO.title)\" while decoding Base64 String", duration: 10, level: .technical)
+			return nil
+		}
+	}
 }
 
 
@@ -45,10 +57,9 @@ import SwiftData
 	@Relationship(deleteRule: .cascade) var images: [ImageCatalogueItem]
     
     //Meta
-    var type: IdeaExtensionType
+	var type: IdeaExtensionType = IdeaExtensionType.imageCatalogue
     
     init(images: [ImageCatalogueItem] = []) {
-        self.type = .imageCatalogue
         self.images = images
     }
 	
@@ -59,6 +70,14 @@ import SwiftData
 		self.images = []
 		for item in copy.images {
 			self.images.append(ImageCatalogueItem(copy: item))
+		}
+	}
+	
+	//Another initialiser for JSON importing
+	init(fromDTOs: [ImageCatalogueItemDTO]) {
+		self.images = []
+		for item in fromDTOs {
+			if let imageItem = ImageCatalogueItem(fromDTO: item) {self.images.append(imageItem)}
 		}
 	}
 }

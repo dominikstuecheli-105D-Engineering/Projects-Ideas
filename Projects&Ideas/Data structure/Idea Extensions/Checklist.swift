@@ -42,7 +42,16 @@ import UniformTypeIdentifiers
 		self.checked = fromTransferable.checked
 		self.position = newPosition
 	}
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: ChecklistItemDTO) {
+		self.title = fromDTO.title
+		self.checked = fromDTO.checked
+		self.position = fromDTO.position
+	}
 }
+
+
 
 //Transferable stuff for Drag&Drop functionality
 class ChecklistItemTransferable: Transferable, Codable {
@@ -77,10 +86,9 @@ extension UTType {
 	@Relationship(deleteRule: .cascade) var items: [ChecklistItem]
 	
 	//Meta
-    var type: IdeaExtensionType
+	var type: IdeaExtensionType = IdeaExtensionType.checklist
     
 	init(_ items: [ChecklistItem] = [ChecklistItem(" ", position: 1)]) {
-        self.type = .checklist
 		self.items = items
     }
 	
@@ -91,6 +99,14 @@ extension UTType {
 		
 		for item in copy.items {
 			self.items.append(ChecklistItem(copy: item))
+		}
+	}
+	
+	//Another initialiser for JSON importing
+	init(fromDTOs: [ChecklistItemDTO]) {
+		self.items = []
+		for item in fromDTOs {
+			self.items.append(ChecklistItem(fromDTO: item))
 		}
 	}
 }

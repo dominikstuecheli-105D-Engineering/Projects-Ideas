@@ -23,6 +23,9 @@ struct ProjectSettingsview: View {
 	@State var tagAddingWindowOpen: Bool = false
 	@State var tagScrollPosition: ScrollPosition = ScrollPosition(y: 0)
 	
+	@State var exportWindowOpen: Bool = false
+	@State var projectExportFile: ProjectFile? = nil
+	
     var body: some View {
 		VStack(spacing: standartPadding) {
 			
@@ -117,18 +120,48 @@ struct ProjectSettingsview: View {
 			standartCheckbox(label: "Check-off button for Ideas", isChecked: $project.settings.useCheckOffIdeaButton)
 				.padding([.leading, .trailing], standartSheetPadding)
 			
-			//Delete project button
-			standartButton(systemName: "Delete project", color: .red, frame: globalUserSettings.UISize.smallText, withBackground: true, containsText: true, withAlert: true, alertTitle: "Delete \(project.title)?") {
-				withAnimation {
-					modelContext.delete(project)
-					
-					//Notification on delete
-					customNotificationCentre.shared.new("Deleted Project: \(project.title)", level: .destructive)
+			//BUTTONS
+			
+			HStack(spacing: standartPadding) {
+				//Delete project button
+				standartButton(systemName: "Delete", color: .red, frame: globalUserSettings.UISize.smallText, withBackground: true, containsText: true, withAlert: true, alertTitle: "Delete \(project.title)?") {
+					withAnimation {
+						modelContext.delete(project)
+						
+						//Notification on delete
+						customNotificationCentre.shared.new("Deleted Project: \(project.title)", level: .destructive)
+					}
+				}
+				
+				//Export project button
+				standartButton(systemName: "Export", color: .blue, frame: globalUserSettings.UISize.smallText, withBackground: true, containsText: true) {
+					DispatchQueue.main.async {
+						do {
+							projectExportFile = try ProjectFile(of: project)
+							exportWindowOpen = true
+						} catch {
+							exportWindowOpen = false
+							customNotificationCentre.shared.new("Failed to encode Project", duration: 3, level: .technical)
+						}
+					}
 				}
 			}
+			.padding([.leading, .trailing], standartSheetPadding)
 		}
 		.padding([.top, .bottom], standartSheetPadding)
 		//Because it is shown in sheets, no further frame stuff is needed
+		
+		//Export window
+		.fileExporter(
+			isPresented: $exportWindowOpen,
+			document: projectExportFile,
+			contentType: .json,
+			defaultFilename: project.title
+		) { result in
+			if case .failure(let error) = result {
+				customNotificationCentre.shared.new("Failed to encode Project: \(error)", duration: 3, level: .technical)
+			}
+		}
     }
 }
 

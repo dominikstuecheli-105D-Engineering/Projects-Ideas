@@ -53,6 +53,20 @@ import UniformTypeIdentifiers
 			self.extensions.append(IdeaExtension(copy: ext))
 		}
 	}
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: IdeaDTO) {
+		self.title = fromDTO.title
+		self.desc = fromDTO.desc
+		self.position = fromDTO.position
+		self.timestamp = fromDTO.timestamp
+		self.minimized = fromDTO.minimized
+		
+		self.extensions = []
+		for extensionDTO in fromDTO.extensions {
+			self.extensions.append(IdeaExtension(fromDTO: extensionDTO))
+		}
+	}
 }
 
 //Transferable stuff for Drag&Drop functionality
@@ -87,6 +101,18 @@ extension UTType {static let ideaTransferableType = UTType(exportedAs: "com.Proj
         self.position = position
         self.colorIdentifier = 1
     }
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: BucketDTO) {
+		self.title = fromDTO.title
+		self.colorIdentifier = fromDTO.colorIdentifier
+		self.position = fromDTO.position
+		
+		self.ideas = []
+		for idea in fromDTO.ideas {
+			self.ideas.append(Idea(fromDTO: idea))
+		}
+	}
 }
 
 
@@ -110,6 +136,20 @@ extension UTType {static let ideaTransferableType = UTType(exportedAs: "com.Proj
         self.settings = ProjectSettings()
 		self.tags = tags
     }
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: ProjectDTO) {
+		self.title = fromDTO.title
+		self.timestamp = fromDTO.timestamp
+		self.settings = ProjectSettings(fromDTO: fromDTO.settings)
+		
+		self.buckets = []
+		for bucket in fromDTO.buckets {
+			self.buckets.append(Bucket(fromDTO: bucket))
+		}
+		
+		integrateTagsOfProjectDTO(tags: fromDTO.tags, project: self)
+	}
 }
 
 
@@ -123,4 +163,12 @@ extension UTType {static let ideaTransferableType = UTType(exportedAs: "com.Proj
 	var useCheckOffIdeaButton: Bool = false
 
 	init() { }
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: ProjectSettingsDTO) {
+		self.ideaDeletionRequiresConfirmation = fromDTO.ideaDeletionRequiresConfirmation
+		self.useScrollViewForBuckets = fromDTO.useScrollViewForBuckets
+		self.scrollViewBucketWidth = fromDTO.scrollViewBucketWidth
+		self.useCheckOffIdeaButton = fromDTO.useCheckOffIdeaButton
+	}
 }

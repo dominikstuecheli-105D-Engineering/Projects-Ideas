@@ -93,22 +93,25 @@ struct standartButton: View {
 					.animation(standartAnimation, value: animationValue) //This is redundant in most cases, but in cases where the value is not changed via withAnimation() the icon should still be animated.
 				
 				//Frame stuff
-					.frame(width: containsText ? nil : frame, height: containsText ? nil : frame)
+					.frame(width: frame, height: frame)
 					.background(withBackground || hoverEffect ? color.opacity(0.25) : Color.clear)
-					.clipShape(RoundedRectangle(cornerRadius: containsText ? standartPadding*2 : standartPadding))
+					.clipShape(RoundedRectangle(cornerRadius: standartPadding))
 			} else {
 				
 				//Text
-				Text(systemName)
-					.font(.system(size: frame, weight: .regular, design: .default))
-					.padding(standartPadding)
-					.contentShape(Rectangle())
-					.foregroundStyle(color)
+				HStack {
+					Spacer(minLength: 0)
+					Text(systemName)
+						.font(.system(size: frame, weight: .bold, design: .default))
+						.padding(standartPadding)
+						.contentShape(Rectangle())
+						.foregroundStyle(color)
+					Spacer(minLength: 0)
+				}
 				
 				//Frame and background stuff
-					.frame(width: containsText ? nil : frame, height: containsText ? nil : frame)
 					.background(withBackground ? color.opacity(0.25).opacity(hoverEffect ? CustomHoverEffect.tintValue : 1) : Color.clear)
-					.clipShape(RoundedRectangle(cornerRadius: containsText ? standartPadding*2 : standartPadding))
+					.clipShape(RoundedRectangle(cornerRadius: standartPadding*2))
 			}
 		}
 		

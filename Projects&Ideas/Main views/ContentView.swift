@@ -163,6 +163,19 @@ struct ContentView: View {
 				}
 			}
 			
+			//PROJECT IMPORT VIA JSON
+			.dropDestination(for: URL.self) { urls, _ in
+				for url in urls {
+					DispatchQueue.main.async {
+						if let project = decodeProjectFromJson(url: url) {
+							modelContext.insert(project)
+							selection = project.id
+						}
+					}
+				}
+				return true
+			}
+			
         } detail: {
 			
 			Group {
@@ -228,7 +241,9 @@ struct ContentView: View {
 		//"Start" the modelContextManager
 		.task {
 			ModelContextManager.shared.setToContext(modelContext)
-			self.selection = ModelContextManager.shared.globalUserSettings?.lastOpenedProject
+			//Only open last opened project if it actually exists, without this the render allowance controller tries to load something that doesnt exist
+			let newSelection = ModelContextManager.shared.globalUserSettings?.lastOpenedProject
+			if projects.contains(where: {$0.id == newSelection}) {self.selection = newSelection}
 			self.categoriseByTags = ModelContextManager.shared.globalUserSettings!.categoriseByTags
 		}
     }

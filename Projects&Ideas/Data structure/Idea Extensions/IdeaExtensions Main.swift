@@ -57,6 +57,25 @@ protocol ValidIdeaExtension {
 		self.checklistContent = (copy.checklistContent == nil ? nil : Checklist(copy: copy.checklistContent!))
 		self.imageCatalogueContent = (copy.imageCatalogueContent == nil ? nil : ImageCatalogue(copy: copy.imageCatalogueContent!))
 	}
+	
+	//Another initialiser for JSON importing
+	init(fromDTO: IdeaExtensionDTO) {
+		self.title = fromDTO.title
+		self.type = fromDTO.type
+		self.position = fromDTO.position
+		self.minimized = fromDTO.minimized
+		
+		switch fromDTO.type {
+		case .checklist: do {
+			self.checklistContent = Checklist(fromDTOs: fromDTO.checklistContent)
+			self.imageCatalogueContent = nil
+		}
+		case .imageCatalogue: do {
+			self.imageCatalogueContent = ImageCatalogue(fromDTOs: fromDTO.imageCatalogueContent)
+			self.checklistContent = nil
+		}
+		}
+	}
 }
 
 
