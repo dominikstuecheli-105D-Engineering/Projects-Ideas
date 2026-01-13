@@ -1,5 +1,5 @@
 //
-//	Tag DTO's.swift
+//	Tag DTO and logic.swift
 //  Projects&Ideas
 //
 //  Created by Dominik Stücheli on 12.01.2026.

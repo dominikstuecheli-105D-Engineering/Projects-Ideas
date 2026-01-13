@@ -157,7 +157,7 @@ struct standartToggle: View {
 	
 	var body: some View {
 		Button {
-			withAnimation(standartAnimation) {value.toggle()}
+			value.toggle()
 		} label: {
 			ZStack {
 				RoundedRectangle(cornerRadius: standartPadding)
@@ -185,6 +185,7 @@ struct standartToggle: View {
 					.padding(.leading, getLeftPadding())
 					.padding(.trailing, getRightPadding())
 			}
+			.animation(standartAnimation, value: value)
 		}
 		.buttonStyle(.plain)
 		.customHoverEffect($hoverEffect, disableTint: true)
@@ -215,9 +216,7 @@ struct standartCheckbox: View {
 	
 	var body: some View {
 		Button {
-			withAnimation(standartAnimation) {
-				isChecked.toggle()
-			}
+			isChecked.toggle()
 		} label: {
 			HStack {
 				Text(label)

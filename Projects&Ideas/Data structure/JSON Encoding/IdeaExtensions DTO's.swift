@@ -1,5 +1,5 @@
 //
-//  IdeaExtensions Main DTO.swift
+//  IdeaExtensions DTO's.swift
 //  Projects&Ideas
 //
 //  Created by Dominik Stücheli on 12.01.2026.
@@ -8,6 +8,42 @@
 
 import Foundation
 import SwiftData
+
+
+
+struct ChecklistItemDTO: Codable {
+	
+	//Content
+	var title: String
+	var checked: Bool
+	
+	//Meta
+	var position: Int
+	
+	init(of: ChecklistItem) {
+		self.title = of.title
+		self.checked = of.checked
+		self.position = of.position
+	}
+}
+
+
+
+struct ImageCatalogueItemDTO: Codable {
+	
+	//Content
+	var image: String
+	var title: String
+	
+	//Meta
+	var position: Int
+	
+	init(of: ImageCatalogueItem) {
+		self.title = of.title
+		self.position = of.position
+		self.image = of.image.base64EncodedString()
+	}
+}
 
 
 

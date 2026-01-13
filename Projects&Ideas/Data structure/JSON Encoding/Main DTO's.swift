@@ -153,23 +153,3 @@ struct ProjectFile: FileDocument {
 		return FileWrapper(regularFileWithContents: data)
 	}
 }
-
-//DECODING JSON TO PROJECT
-func decodeProjectFromJson(url: URL) -> Project? {
-	do {
-		//Converting to Data
-		let data = try Data(contentsOf: url)
-		
-		//Decoding to DTO
-		let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
-		let projectDTO = try decoder.decode(ProjectDTO.self, from: data)
-		
-		//Decoding DTO to Model
-		return Project(fromDTO: projectDTO)
-		
-	//Error handling
-	} catch {
-		customNotificationCentre.shared.new("Failed to import", duration: 3, level: .destructive)
-		return nil
-	}
-}

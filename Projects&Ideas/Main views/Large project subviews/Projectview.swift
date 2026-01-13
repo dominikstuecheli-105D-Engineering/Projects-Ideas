@@ -534,6 +534,9 @@ struct Bucketview: View {
 		//if using horizontal scroll view for buckets, fix the width
 		.frame(width: project.settings.useScrollViewForBuckets ? CGFloat(project.settings.scrollViewBucketWidth) : nil)
 		
+		//.containerRelativeFrame(.horizontal, count: 3, spacing: standartPadding)
+		/// -> Maybe add some time later, would be an alternative to the fixed pixel width
+		
 		.background(bucket.getSelfColor(colorScheme))
 		
         .clipShape(RoundedRectangle(cornerRadius: standartPadding*3))

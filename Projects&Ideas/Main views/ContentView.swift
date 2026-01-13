@@ -75,6 +75,9 @@ struct ContentView: View {
 		
 		DispatchQueue.main.asyncAfter(deadline: .now()+1, execute: reloadWorkItem!)
 	}
+	
+	//STATE VALUES
+	@State var importWindowOpen: Bool = false
     
 	//Viewcode
     var body: some View {
@@ -152,7 +155,14 @@ struct ContentView: View {
 						customNotificationCentre.shared.new("Created new Project: for help, got to Help page", duration: 10, level: .important)
 					}
 				} label: {
-					Label("Add Project", systemImage: "document.badge.plus")
+					Label("Add Project", systemImage: "plus")
+				} }
+				
+				//Button to open the import window for project import via json
+				ToolbarItem {  Button {
+					importWindowOpen.toggle()
+				} label: {
+					Label("Import Project", systemImage: "folder")
 				} }
 				
 				//Toggle for categorising by tags
@@ -164,22 +174,35 @@ struct ContentView: View {
 			}
 			
 			//PROJECT IMPORT VIA JSON
-			.dropDestination(for: URL.self) { urls, _ in
+			//Drag&Drop
+			.dropDestination(for: URL.self) { urls,_ in
 				for url in urls {
-					DispatchQueue.main.async {
-						if let project = decodeProjectFromJson(url: url) {
-							modelContext.insert(project)
-							selection = project.id
-						}
-					}
-				}
-				return true
+					Task { do {
+						let project = try await decodeProjectFromJson(url: url)
+						modelContext.insert(project)
+						selection = project.id
+					} catch {
+						customNotificationCentre.shared.new("Import failed: \(error)", level: .destructive)
+					} }
+				}; return true
+			}
+			
+			//Manual import
+			.fileImporter(isPresented: $importWindowOpen, allowedContentTypes: [.json]) { result in
+				Task { do {
+					let url = try result .get()
+					let project = try await decodeProjectFromJson(url: url)
+					modelContext.insert(project)
+					selection = project.id
+				} catch {
+					customNotificationCentre.shared.new("Import failed: \(error)", level: .destructive)
+				} }
 			}
 			
         } detail: {
 			
 			Group {
-				//Projectview
+				//PROJECTVIEW
 				if let viewedProject = projects.first(where: {$0.id == openedPage}) {
 					Projectview(project: viewedProject, clipBoard: $clipBoard) {scheduleViewReload()}
 						.environment(ModelContextManager.shared.unwrappedGlobalUserSettings())
