@@ -12,7 +12,7 @@ import SwiftData
 
 
 //Decoding JSON to Project
-func decodeProjectFromJson(url: URL) async throws -> Project {
+@MainActor func decodeProjectFromJson(url: URL, to context: ModelContext) async throws -> Project {
 	
 	//Politely ask to access the url
 	let needsScope = url.startAccessingSecurityScopedResource()
@@ -25,11 +25,9 @@ func decodeProjectFromJson(url: URL) async throws -> Project {
 	let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
 	let projectDTO = try decoder.decode(ProjectDTO.self, from: data)
 	
-	//Decoding DTO to Model
-	return Project(fromDTO: projectDTO)
+	//Decoding DTO to Model and inserting
+	let project = Project()
+	context.insert(project)
+	project.setFromDTO(projectDTO, to: context)
+	return project
 }
-
-
-
-//Importing project
-

@@ -179,7 +179,7 @@ struct IdeaExtensionChecklistView: View {
 			.padding(standartPadding)
 			.frame(width: 350)
 		
-			.environment(ProjectSettings())
+			.environment(Project())
 			.environment(GlobalUserSettings())
 	}
 }

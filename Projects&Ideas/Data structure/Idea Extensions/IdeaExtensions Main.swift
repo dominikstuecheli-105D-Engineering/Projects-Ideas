@@ -59,7 +59,7 @@ protocol ValidIdeaExtension {
 	}
 	
 	//Another initialiser for JSON importing
-	init(fromDTO: IdeaExtensionDTO) {
+	init(fromDTO: IdeaExtensionDTO, to context: ModelContext) {
 		self.title = fromDTO.title
 		self.type = fromDTO.type
 		self.position = fromDTO.position
@@ -67,11 +67,15 @@ protocol ValidIdeaExtension {
 		
 		switch fromDTO.type {
 		case .checklist: do {
-			self.checklistContent = Checklist(fromDTOs: fromDTO.checklistContent)
+			let newContent = Checklist(fromDTOs: fromDTO.checklistContent, to: context)
+			context.insert(newContent)
+			self.checklistContent = newContent
 			self.imageCatalogueContent = nil
 		}
 		case .imageCatalogue: do {
-			self.imageCatalogueContent = ImageCatalogue(fromDTOs: fromDTO.imageCatalogueContent)
+			let newContent = ImageCatalogue(fromDTOs: fromDTO.imageCatalogueContent, to: context)
+			context.insert(newContent)
+			self.imageCatalogueContent = newContent
 			self.checklistContent = nil
 		}
 		}

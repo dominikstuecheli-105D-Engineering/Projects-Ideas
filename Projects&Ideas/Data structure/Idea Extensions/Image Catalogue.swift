@@ -74,10 +74,13 @@ import SwiftData
 	}
 	
 	//Another initialiser for JSON importing
-	init(fromDTOs: [ImageCatalogueItemDTO]) {
+	init(fromDTOs: [ImageCatalogueItemDTO], to context: ModelContext) {
 		self.images = []
 		for item in fromDTOs {
-			if let imageItem = ImageCatalogueItem(fromDTO: item) {self.images.append(imageItem)}
+			if let imageItem = ImageCatalogueItem(fromDTO: item) {
+				context.insert(imageItem)
+				self.images.append(imageItem)
+			}
 		}
 	}
 }

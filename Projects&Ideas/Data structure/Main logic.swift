@@ -130,6 +130,15 @@ extension Project {
             ideaCounter += bucket.ideas.count
         }
         
-        return "\"\(title)\", \(ideaCounter) Ideas in \(buckets.count) Buckets"
+        return "\(ideaCounter) Ideas in \(buckets.count) Buckets"
     }
+	
+	//The context that is sent with a peer-to-peer connection invite
+	func sendableDataContext(encodedSize: Int) -> SendableDataContext {
+		let formatter = ByteCountFormatter() //nice formatting for the file size
+		formatter.countStyle = .file; formatter.includesUnit = true
+		let sizeString = formatter.string(fromByteCount: Int64(encodedSize))
+		
+		return SendableDataContext(primary: title, secondary: summary(), tertiary: sizeString)
+	}
 }

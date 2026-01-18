@@ -151,7 +151,6 @@ struct ContentView: View {
 				ToolbarItem {  Button {
 					withAnimation {
 						newProject()
-						selection = presetproject.id
 						customNotificationCentre.shared.new("Created new Project: for help, got to Help page", duration: 10, level: .important)
 					}
 				} label: {
@@ -178,8 +177,7 @@ struct ContentView: View {
 			.dropDestination(for: URL.self) { urls,_ in
 				for url in urls {
 					Task { do {
-						let project = try await decodeProjectFromJson(url: url)
-						modelContext.insert(project)
+						let project = try await decodeProjectFromJson(url: url, to: modelContext)
 						selection = project.id
 					} catch {
 						customNotificationCentre.shared.new("Import failed: \(error)", level: .destructive)
@@ -191,8 +189,7 @@ struct ContentView: View {
 			.fileImporter(isPresented: $importWindowOpen, allowedContentTypes: [.json]) { result in
 				Task { do {
 					let url = try result .get()
-					let project = try await decodeProjectFromJson(url: url)
-					modelContext.insert(project)
+					let project = try await decodeProjectFromJson(url: url, to: modelContext)
 					selection = project.id
 				} catch {
 					customNotificationCentre.shared.new("Import failed: \(error)", level: .destructive)
@@ -268,12 +265,45 @@ struct ContentView: View {
 			let newSelection = ModelContextManager.shared.globalUserSettings?.lastOpenedProject
 			if projects.contains(where: {$0.id == newSelection}) {self.selection = newSelection}
 			self.categoriseByTags = ModelContextManager.shared.globalUserSettings!.categoriseByTags
+			
+			//Dont mind this random thing here
+			PeerConnectionController.shared.changeProjectSelection = {id in selection = id}
 		}
+		
+		//Peer-to-Peer invitation
+		.alert(PeerConnectionController.shared.invitationTitle(), isPresented: Binding(
+			get: {return PeerConnectionController.shared.receivedInvite},
+			set: { _ in })) {
+				Button(role: .none) {
+					//Accept invitation
+					PeerConnectionController.shared.handleInvite(accept: true)
+				} label: {
+					Text("Accept")
+				}
+				Button(role: .cancel) {
+					//Decline invitation
+					PeerConnectionController.shared.handleInvite(accept: false)
+				} label: {
+					Text("Cancel")
+				}
+			} message: {
+				Text(PeerConnectionController.shared.receivedDataContext.asString())
+			}
+		
+		//Peer-to-Peer connection select sheet
+		.sheet(isPresented: Binding(get: {return PeerConnectionController.shared.isBrowsing},
+									set: {setVar in PeerConnectionController.shared.setIsBrowsing(to: setVar)})) {
+			PeerSearchSheet()
+				.environment(ModelContextManager.shared.unwrappedGlobalUserSettings())
+		}
+		
     }
     
     func newProject() {
-        let newproject = presetproject
-        modelContext.insert(newproject)
+		let project = Project()
+		modelContext.insert(project)
+		project.buckets.append(Bucket(title: "new Bucket", position: 1))
+		selection = project.id
     }
 }
 

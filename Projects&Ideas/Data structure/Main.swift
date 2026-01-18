@@ -55,7 +55,7 @@ import UniformTypeIdentifiers
 	}
 	
 	//Another initialiser for JSON importing
-	init(fromDTO: IdeaDTO) {
+	init(fromDTO: IdeaDTO, to context: ModelContext) {
 		self.title = fromDTO.title
 		self.desc = fromDTO.desc
 		self.position = fromDTO.position
@@ -64,7 +64,9 @@ import UniformTypeIdentifiers
 		
 		self.extensions = []
 		for extensionDTO in fromDTO.extensions {
-			self.extensions.append(IdeaExtension(fromDTO: extensionDTO))
+			let newExtension = IdeaExtension(fromDTO: extensionDTO, to: context)
+			context.insert(newExtension)
+			self.extensions.append(newExtension)
 		}
 	}
 }
@@ -103,14 +105,16 @@ extension UTType {static let ideaTransferableType = UTType(exportedAs: "com.Proj
     }
 	
 	//Another initialiser for JSON importing
-	init(fromDTO: BucketDTO) {
+	init(fromDTO: BucketDTO, to context: ModelContext) {
 		self.title = fromDTO.title
 		self.colorIdentifier = fromDTO.colorIdentifier
 		self.position = fromDTO.position
 		
 		self.ideas = []
 		for idea in fromDTO.ideas {
-			self.ideas.append(Idea(fromDTO: idea))
+			let newIdea = Idea(fromDTO: idea, to: context)
+			context.insert(newIdea)
+			self.ideas.append(newIdea)
 		}
 	}
 }
@@ -123,52 +127,47 @@ extension UTType {static let ideaTransferableType = UTType(exportedAs: "com.Proj
 	@Relationship(deleteRule: .cascade) var buckets: [Bucket]
 	
 	//Tags
-	var tags: [TagReference] = []
+	@Relationship(deleteRule: .cascade) var tags: [TagReference] = []
     
     //Meta
     var id = UUID()
     var timestamp = Date()
-	@Relationship(deleteRule: .cascade) var settings: ProjectSettings
-
-	init(title: String = "new Project", buckets: [Bucket] = [], tags: [TagReference] = []) {
-        self.title = title
-        self.buckets = buckets
-        self.settings = ProjectSettings()
-		self.tags = tags
-    }
 	
-	//Another initialiser for JSON importing
-	init(fromDTO: ProjectDTO) {
-		self.title = fromDTO.title
-		self.timestamp = fromDTO.timestamp
-		self.settings = ProjectSettings(fromDTO: fromDTO.settings)
-		
-		self.buckets = []
-		for bucket in fromDTO.buckets {
-			self.buckets.append(Bucket(fromDTO: bucket))
-		}
-		
-		integrateTagsOfProjectDTO(tags: fromDTO.tags, project: self)
-	}
-}
-
-
-
-//All Project specific settings are saved here
-@Model class ProjectSettings {
-    
-    var ideaDeletionRequiresConfirmation: Bool = true
-    var useScrollViewForBuckets: Bool = false
+	//Settings
+	var ideaDeletionRequiresConfirmation: Bool = true
+	var useScrollViewForBuckets: Bool = false
 	var scrollViewBucketWidth: Int = 350
 	var useCheckOffIdeaButton: Bool = false
 
-	init() { }
+	init(title: String = "new Project") {
+        self.title = title
+        self.buckets = []
+		self.tags = []
+    }
+	
+	//This initialiser should NEVER BE USED for actual projects as it may create faulty relationships
+	init(title: String = "Preset project", buckets: [Bucket] = [], tags: [TagReference] = [], neverUseThisInitialiser: Bool) {
+		self.title = title
+		self.buckets = buckets
+		self.tags = tags
+	}
 	
 	//Another initialiser for JSON importing
-	init(fromDTO: ProjectSettingsDTO) {
-		self.ideaDeletionRequiresConfirmation = fromDTO.ideaDeletionRequiresConfirmation
-		self.useScrollViewForBuckets = fromDTO.useScrollViewForBuckets
-		self.scrollViewBucketWidth = fromDTO.scrollViewBucketWidth
-		self.useCheckOffIdeaButton = fromDTO.useCheckOffIdeaButton
+	func setFromDTO(_ fromDTO: ProjectDTO, to context: ModelContext) {
+		title = fromDTO.title
+		timestamp = fromDTO.timestamp
+		
+		ideaDeletionRequiresConfirmation = fromDTO.ideaDeletionRequiresConfirmation
+		useScrollViewForBuckets = fromDTO.useScrollViewForBuckets
+		scrollViewBucketWidth = fromDTO.scrollViewBucketWidth
+		useCheckOffIdeaButton = fromDTO.useCheckOffIdeaButton
+		
+		for bucket in fromDTO.buckets {
+			let newBucket = Bucket(fromDTO: bucket, to: context)
+			context.insert(newBucket)
+			buckets.append(newBucket)
+		}
+		
+		integrateTagsOfProjectDTO(tags: fromDTO.tags, project: self)
 	}
 }

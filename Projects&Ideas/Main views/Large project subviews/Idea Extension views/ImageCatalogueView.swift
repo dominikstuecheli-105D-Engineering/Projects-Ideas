@@ -117,7 +117,7 @@ struct IdeaExtensionImageCatalogueView: View {
 	@State var fullscreenImageData: Data? = nil
 	
 	@Environment(GlobalUserSettings.self) var globalUserSettings: GlobalUserSettings
-	@Environment(ProjectSettings.self) var projectSettings: ProjectSettings
+	@Environment(Project.self) var project: Project
 	@Environment(\.colorScheme) var colorScheme
 	
 	//Code for the dropDestination (as well as the PhotosPicker)
@@ -206,7 +206,7 @@ struct IdeaExtensionImageCatalogueView: View {
 							Spacer()
 							
 							//Delete image
-							standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: projectSettings.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete Image: \(imageItem.title)?") {
+							standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: project.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete Image: \(imageItem.title)?") {
 								withAnimation(standartAnimation) {
 									imageCatalogue.images.remove(imageItem)
 									
@@ -325,7 +325,7 @@ struct IdeaExtensionImageCatalogueView: View {
 			.padding(standartPadding)
 			.frame(width: 350)
 			.environment(GlobalUserSettings())
-			.environment(ProjectSettings())
+			.environment(Project())
 	}
 }
 #endif

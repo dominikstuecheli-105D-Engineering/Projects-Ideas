@@ -85,12 +85,23 @@ struct ProjectDTO: Codable {
 	
 	//Meta
 	var timestamp: Date
-	var settings: ProjectSettingsDTO
+	var id: UUID
+	
+	//Settings
+	var ideaDeletionRequiresConfirmation: Bool
+	var useScrollViewForBuckets: Bool
+	var scrollViewBucketWidth: Int
+	var useCheckOffIdeaButton: Bool
 	
 	init(of: Project) {
 		self.title = of.title
 		self.timestamp = of.timestamp
-		self.settings = ProjectSettingsDTO(of: of.settings)
+		self.id = of.id
+		
+		self.ideaDeletionRequiresConfirmation = of.ideaDeletionRequiresConfirmation
+		self.useScrollViewForBuckets = of.useScrollViewForBuckets
+		self.scrollViewBucketWidth = of.scrollViewBucketWidth
+		self.useCheckOffIdeaButton = of.useCheckOffIdeaButton
 		
 		self.buckets = []
 		for bucket in of.buckets {self.buckets.append(bucket.getDTO())}
@@ -105,20 +116,6 @@ struct ProjectDTO: Codable {
 		encoder.dateEncodingStrategy = .iso8601
 		encoder.outputFormatting = [.prettyPrinted]
 		return try encoder.encode(self)
-	}
-}
-
-struct ProjectSettingsDTO: Codable {
-	var ideaDeletionRequiresConfirmation: Bool
-	var useScrollViewForBuckets: Bool
-	var scrollViewBucketWidth: Int
-	var useCheckOffIdeaButton: Bool
-
-	init(of: ProjectSettings) {
-		self.ideaDeletionRequiresConfirmation = of.ideaDeletionRequiresConfirmation
-		self.useScrollViewForBuckets = of.useScrollViewForBuckets
-		self.scrollViewBucketWidth = of.scrollViewBucketWidth
-		self.useCheckOffIdeaButton = of.useCheckOffIdeaButton
 	}
 }
 

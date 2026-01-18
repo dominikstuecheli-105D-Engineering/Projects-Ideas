@@ -103,10 +103,12 @@ extension UTType {
 	}
 	
 	//Another initialiser for JSON importing
-	init(fromDTOs: [ChecklistItemDTO]) {
+	init(fromDTOs: [ChecklistItemDTO], to context: ModelContext) {
 		self.items = []
 		for item in fromDTOs {
-			self.items.append(ChecklistItem(fromDTO: item))
+			let newItem = ChecklistItem(fromDTO: item)
+			context.insert(newItem)
+			self.items.append(newItem)
 		}
 	}
 }

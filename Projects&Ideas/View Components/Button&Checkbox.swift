@@ -54,7 +54,9 @@ struct standartButton: View {
 	let color: Color
 	let frame: CGFloat //The size
 	var withBackground: Bool = false
+	var cornerRadius: CGFloat = standartPadding
 	var containsText: Bool = false //Use text rather than an icon for the label
+	var tryToExpand: Bool = true
 	
 	//If Animated
 	var animationValue: Bool = false //The value to be animated by
@@ -95,23 +97,23 @@ struct standartButton: View {
 				//Frame stuff
 					.frame(width: frame, height: frame)
 					.background(withBackground || hoverEffect ? color.opacity(0.25) : Color.clear)
-					.clipShape(RoundedRectangle(cornerRadius: standartPadding))
+					.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 			} else {
 				
 				//Text
 				HStack {
-					Spacer(minLength: 0)
+					if tryToExpand {Spacer(minLength: 0)}
 					Text(systemName)
 						.font(.system(size: frame, weight: .bold, design: .default))
 						.padding(standartPadding)
 						.contentShape(Rectangle())
 						.foregroundStyle(color)
-					Spacer(minLength: 0)
+					if tryToExpand {Spacer(minLength: 0)}
 				}
 				
 				//Frame and background stuff
 					.background(withBackground ? color.opacity(0.25).opacity(hoverEffect ? CustomHoverEffect.tintValue : 1) : Color.clear)
-					.clipShape(RoundedRectangle(cornerRadius: standartPadding*2))
+					.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 			}
 		}
 		

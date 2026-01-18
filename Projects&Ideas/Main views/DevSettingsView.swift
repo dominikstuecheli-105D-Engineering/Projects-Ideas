@@ -23,7 +23,6 @@ struct DevSettingsview: View {
 	//SwiftUI does not update with file-wide values (they are not Observable). debugMode is not an Observed value so this is pseudo value for the checkbox to immediately respond.
 	@State var localDebugMode: Bool = false
 	
-	@Query var projects: [Project]
 	@Environment(GlobalUserSettings.self) var globalUserSettings: GlobalUserSettings
 	
 	var body: some View {
@@ -101,7 +100,7 @@ struct DevSettingsview: View {
 			
 			
 		}
-		.padding(standartPadding)
+		.padding(standartSheetPadding)
 		//Because it is shown in sheets, no further frame stuff is needed
 		
 		.onAppear { localDebugMode = debugMode }

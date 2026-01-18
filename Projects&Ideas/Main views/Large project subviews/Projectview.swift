@@ -23,7 +23,7 @@ struct IdeaExtensionView: View {
     @Bindable var ideaExtension: IdeaExtension
     
 	@Environment(GlobalUserSettings.self) var globalUserSettings: GlobalUserSettings
-	@Environment(ProjectSettings.self) var projectSettings: ProjectSettings
+	@Environment(Project.self) var project: Project
     
     var body: some View {
         VStack(spacing: 0) {
@@ -42,7 +42,7 @@ struct IdeaExtensionView: View {
                 HStack(spacing: standartPadding) {
                     
                     //DELETE
-					standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: projectSettings.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete idea Extension: \(ideaExtension.title)?") {
+					standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: project.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete idea Extension: \(ideaExtension.title)?") {
                         withAnimation(standartAnimation) {
                             idea.extensions.remove(ideaExtension)
                             
@@ -196,7 +196,6 @@ struct Ideaview: View {
     @Binding var clipBoard: Idea?
     
 	@Environment(GlobalUserSettings.self) var globalUserSettings: GlobalUserSettings
-	@Environment(ProjectSettings.self) var projectSettings: ProjectSettings
 	@Environment(Project.self) var project: Project
 	
 	@Environment(\.colorScheme) var colorScheme
@@ -230,7 +229,7 @@ struct Ideaview: View {
 					HStack(spacing: 0) {
 						
 						//CHECK OFF IDEA
-						if projectSettings.useCheckOffIdeaButton {
+						if project.useCheckOffIdeaButton {
 							standartButton(systemName: "checkmark", color: project.getLastBucketColor(colorScheme), frame: globalUserSettings.UISize.small, withBackground: true) {
 								withAnimation(standartAnimation) {
 									if !shiftPressed {
@@ -256,7 +255,7 @@ struct Ideaview: View {
 						}
 						
 						//DELETE
-						standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: projectSettings.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete Idea: \(idea.title)?") {
+						standartButton(systemName: "trash", color: primaryUIelement, frame: globalUserSettings.UISize.small, withAlert: project.ideaDeletionRequiresConfirmation ? true : false, alertTitle: "Delete Idea: \(idea.title)?") {
 							withAnimation(standartAnimation) {
 								bucket.ideas.remove(idea)
 								
@@ -532,7 +531,7 @@ struct Bucketview: View {
 		//Frame for everything
 		.frame(minWidth: 200)
 		//if using horizontal scroll view for buckets, fix the width
-		.frame(width: project.settings.useScrollViewForBuckets ? CGFloat(project.settings.scrollViewBucketWidth) : nil)
+		.frame(width: project.useScrollViewForBuckets ? CGFloat(project.scrollViewBucketWidth) : nil)
 		
 		//.containerRelativeFrame(.horizontal, count: 3, spacing: standartPadding)
 		/// -> Maybe add some time later, would be an alternative to the fixed pixel width
@@ -562,14 +561,14 @@ struct Projectview: View {
     var body: some View {
         //Group so that the toolbar works
         Group {
-			if project.settings.useScrollViewForBuckets {
+			if project.useScrollViewForBuckets {
 				
 				//If scrollview is used
 				ScrollView(Axis.Set.horizontal, showsIndicators: false) {
 					HStack(spacing: standartPadding) {
 						ForEach(project.buckets.sorted {$0.position < $1.position}) { bucket in
 							Bucketview(bucket: bucket, clipBoard: $clipBoard)
-								.renderAllowance(id: bucket.id, placeholder: true, width: CGFloat(project.settings.scrollViewBucketWidth), cornerRadius: standartPadding*3)
+								.renderAllowance(id: bucket.id, placeholder: true, width: CGFloat(project.scrollViewBucketWidth), cornerRadius: standartPadding*3)
 						}
 					}
 				} .scrollPosition($scrollPosition)
@@ -591,33 +590,32 @@ struct Projectview: View {
         }
 		
 		//Make the project settings and the project itself accessible to all subviews
-		.environment(project.settings)
 		.environment(project)
 		
         //Toolbar
         .toolbar {
 			//If scroll view is enabled, show the buttons to edit bucket width
-			if project.settings.useScrollViewForBuckets {
+			if project.useScrollViewForBuckets {
 				ToolbarItemGroup {
 					customToolbarDivider()
 					
 					//Smaller
 					Button {
-						if project.settings.scrollViewBucketWidth > 200 {
-							project.settings.scrollViewBucketWidth -= 10
+						if project.scrollViewBucketWidth > 200 {
+							project.scrollViewBucketWidth -= 10
 						}
 					} label: {
 						Label("Smaller", systemImage: "arrow.right.and.line.vertical.and.arrow.left")
 					}
 					
 					//Size
-					Text("\(project.settings.scrollViewBucketWidth)px")
+					Text("\(project.scrollViewBucketWidth)px")
 						.foregroundStyle(toolbarItemColor())
 						.fixedSize(horizontal: true, vertical: false) //needed for proper function on iOS 26+
 					
 					//Larger
 					Button {
-						project.settings.scrollViewBucketWidth += 10
+						project.scrollViewBucketWidth += 10
 					} label: {
 						Label("Wider", systemImage: "arrow.left.and.line.vertical.and.arrow.right")
 					}
@@ -665,7 +663,7 @@ struct Projectview: View {
 				//Add new Bucket
 				Button {
 					let newBucket = Bucket(position: project.buckets.count+1)
-					if project.settings.useScrollViewForBuckets {
+					if project.useScrollViewForBuckets {
 						project.buckets.add(newBucket)
 						withAnimation(standartAnimation) {
 							scrollPosition.scrollTo(id: newBucket.id)

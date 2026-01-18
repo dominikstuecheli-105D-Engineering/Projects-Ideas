@@ -75,7 +75,7 @@ struct SideBarTitle: View {
 }
 
 #Preview {
-	SideBarTitle(project: Project(tags: [TagReference(Tag())]))
+	SideBarTitle(project: Project(tags: [TagReference(Tag())], neverUseThisInitialiser: true))
 		.frame(width: 150, height: 20)
 		.padding()
 		.border(.gray)

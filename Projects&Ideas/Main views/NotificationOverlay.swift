@@ -54,16 +54,16 @@ private let standartNotificationDuration: TimeInterval = 3
 
 
 
-class customNotificationCentre: ObservableObject {
+@Observable class customNotificationCentre {
 	
 	static var shared = customNotificationCentre()
 	
-    @Published var notifications: [customNotification] = []
+	var notifications: [customNotification] = []
 
 	func new(_ title: String, duration: TimeInterval = standartNotificationDuration, level: NotificationLevel = .standart) {
 		
 		let newNotification = customNotification(title: title, duration: duration, level: level)
-		notifications.insert(newNotification, at: 0)
+		DispatchQueue.main.async {self.notifications.insert(newNotification, at: 0)} //On main actor, in case it is called from somewhere else
 		
 		//Remove after certain timeframe
 		DispatchQueue.main.asyncAfter(deadline: .now() + newNotification.duration) {

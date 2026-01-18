@@ -109,32 +109,35 @@ struct ProjectSettingsview: View {
 			
 			//ACTUAL SETTINGS
 			
-			standartCheckbox(label: "Require confirmation to delete Ideas and Idea Extensions", isChecked: $project.settings.ideaDeletionRequiresConfirmation)
+			standartCheckbox(label: "Require confirmation to delete Ideas and Idea Extensions", isChecked: $project.ideaDeletionRequiresConfirmation)
 				.padding([.leading, .trailing], standartSheetPadding)
 			
-			standartCheckbox(label: "Horizontal scroll view for Buckets", isChecked: $project.settings.useScrollViewForBuckets)
+			standartCheckbox(label: "Horizontal scroll view for Buckets", isChecked: $project.useScrollViewForBuckets)
 				.padding([.leading, .trailing], standartSheetPadding)
 			
-				.onChange(of: project.settings.useScrollViewForBuckets) { _, new in settingsOpened = false}
+				.onChange(of: project.useScrollViewForBuckets) { _, new in settingsOpened = false}
 			
-			standartCheckbox(label: "Check-off button for Ideas", isChecked: $project.settings.useCheckOffIdeaButton)
+			standartCheckbox(label: "Check-off button for Ideas", isChecked: $project.useCheckOffIdeaButton)
 				.padding([.leading, .trailing], standartSheetPadding)
 			
 			//BUTTONS
 			
 			HStack(spacing: standartPadding) {
 				//Delete project button
-				standartButton(systemName: "Delete", color: .red, frame: globalUserSettings.UISize.smallText, withBackground: true, containsText: true, withAlert: true, alertTitle: "Delete \(project.title)?") {
+				standartButton(systemName: "Delete", color: .red, frame: globalUserSettings.UISize.smallText, withBackground: true, cornerRadius: standartPadding*2, containsText: true, withAlert: true, alertTitle: "Delete \(project.title)?") {
+					
+					PeerConnectionController.shared.changeProjectSelection!(nil)
+					modelContext.delete(project)
+					do {try modelContext.save()} catch {} //Yea no im not bothered to do error handling here
+					
 					withAnimation {
-						modelContext.delete(project)
-						
 						//Notification on delete
 						customNotificationCentre.shared.new("Deleted Project: \(project.title)", level: .destructive)
 					}
 				}
 				
 				//Export project button
-				standartButton(systemName: "Export", color: .blue, frame: globalUserSettings.UISize.smallText, withBackground: true, containsText: true) {
+				standartButton(systemName: "Export", color: .blue, frame: globalUserSettings.UISize.smallText, withBackground: true, cornerRadius: standartPadding*2, containsText: true) {
 					DispatchQueue.main.async {
 						do {
 							projectExportFile = try ProjectFile(of: project)
@@ -142,6 +145,19 @@ struct ProjectSettingsview: View {
 						} catch {
 							exportWindowOpen = false
 							customNotificationCentre.shared.new("Failed to encode Project", duration: 3, level: .technical)
+						}
+					}
+				}
+				
+				//Send project via Peer-to-Peer button
+				standartButton(systemName: "Send", color: .teal, frame: globalUserSettings.UISize.smallText, withBackground: true, cornerRadius: standartPadding*2, containsText: true) {
+					settingsOpened = false
+					DispatchQueue.main.async {
+						do {
+							let data = try project.getDTO().encode()
+							PeerConnectionController.shared.prepareBuffer(data: data, context: project.sendableDataContext(encodedSize: data.count))
+						} catch {
+							customNotificationCentre.shared.new("Failed to encode Project: \(error)", duration: 3, level: .technical)
 						}
 					}
 				}
